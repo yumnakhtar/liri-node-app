@@ -41,6 +41,9 @@ var movie = function () {
                 console.log("Actors: " + JSON.parse(body).Actors);
                 start();
             }
+            else {
+                throw error;
+            }
         });
     })
 }
@@ -56,8 +59,17 @@ var song = function () {
             }
         ]).then(function (inquirerResponse) {
             var input = inquirerResponse.song;
-
-            spotify.search({ type: 'track', query: input }).then(function (response) {
+            var movieName = "";
+            //iterate through input to make into correct format for API call
+            for (var i = 0; i < input.length; i++) {
+                if (i > 0 && i < input.length) {
+                  movieName = movieName + "+" + input[i];
+                }
+                else {
+                  movieName += input[i];
+                }
+            }
+            spotify.search({ type: 'track', query: movieName }).then(function (response) {
                 console.log("Artist name: " + response.tracks.items[0].artists[0].name);
                 console.log("The song name: " + response.tracks.items[0].name);
                 console.log("Album name: " + response.tracks.items[0].album.name);

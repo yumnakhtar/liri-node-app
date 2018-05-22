@@ -12,52 +12,114 @@ var Spotify = require("node-spotify-api");
 var spotify = new Spotify(keys.spotify);
 //request
 var Request = require("request");
+//inquirer
+var inquirer = require("inquirer");
 
 
+//function using omdb
+var movie = function () {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What movie would you like to search?",
+            name: "movie"
+        }
+    ]).then(function (inquirerResponse) {
+        var input = inquirerResponse.movie;
 
-//twitter function
-var tweets = function(){
-    var params = {screen_name:'realDonaldTrump'};
-    client.get('statuses/user_timeline',params, function (error, tweets, response) {
-        if (!error){
-            for(var i=0; i<20; i++){
-                console.log((i+1)+ ": " + tweets[i].text); 
+        var queryUrl = "http://www.omdbapi.com/?t=" + input + "&y=&plot=short&apikey=trilogy";
+
+        Request(queryUrl, function (error, response, body) {
+            if (!error && response.statusCode === 200) {
+                console.log("Release Year: " + JSON.parse(body).Year);
+                console.log("Movie Title: " + JSON.parse(body).Title);
+                console.log("IMDB Rating: " + JSON.parse(body).Rated);
+                console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value);
+                console.log("Production location: " + JSON.parse(body).Country);
+                console.log("Language: " + JSON.parse(body).Language);
+                console.log("Plot: " + JSON.parse(body).Plot);
+                console.log("Actors: " + JSON.parse(body).Actors);
+                start();
             }
-        } else{
-            throw error;
-        }
-    });
+        });
+    })
 }
 
-//spotify function
-function playSongs(){
+//function using spotify
+var song = function () {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "What is a song you'd like to look up?",
+                name: "song"
+            }
+        ]).then(function (inquirerResponse) {
+            var input = inquirerResponse.song;
 
-    spotify.search({ type: 'track', query: 'All the Small Things' }).then(function(response) {
-        console.log("Artist name: " + response.tracks.items[0].artists[0].name);
-        console.log("The song name: " + response.tracks.items[0].name);
-        console.log("Album name: " + response.tracks.items[0].album.name);
-        console.log("External URL: " + response.tracks.items[0].album.artists[0].external_urls.spotify);
-      }).catch(function(err) {
-        console.log(err);
-      });
+            spotify.search({ type: 'track', query: input }).then(function (response) {
+                console.log("Artist name: " + response.tracks.items[0].artists[0].name);
+                console.log("The song name: " + response.tracks.items[0].name);
+                console.log("Album name: " + response.tracks.items[0].album.name);
+                console.log("External URL: " + response.tracks.items[0].album.artists[0].external_urls.spotify);
+                start();
+            }).catch(function (err) {
+                console.log(err);
+            });
+        })
 }
 
-//OMDB function
-function omdbRatings(){
-    var movieName = "Mr Nobody";
-    var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
+//function using twitter
+var tweet = function () {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Whose tweets would you like to look up?",
+                name: "account"
+            }
+        ]).then(function (inquirerResponse) {
+            var input = inquirerResponse.account;
 
-    Request(queryUrl, function(error, response, body) {
-        if (!error && response.statusCode === 200) {
-            console.log("Release Year: " + JSON.parse(body).Year);
-            console.log("Movie Title: " + JSON.parse(body).Title);
-            console.log("IMDB Rating: " + JSON.parse(body).Rated);
-            console.log("IMDB Rating: " + JSON.parse(body).Ratings[1].Value);
-            console.log("Country produced: " + JSON.parse(body).Country);
-            console.log("Language: " + JSON.parse(body).Language);
-            console.log("Plot: " + JSON.parse(body).Plot);
-            console.log("Actors: " + JSON.parse(body).Actors);
-        }
-    });
+            var params = { screen_name: input };
+            client.get('statuses/user_timeline', params, function (error, tweets, response) {
+                if (!error) {
+                    console.log("Users 20 latest tweets:")
+                    for (var i = 0; i < 20; i++) {
+                        console.log((i + 1) + ": " + tweets[i].text);
+                    }
+                } else {
+                    throw error;
+                }
+                start();
+            });
+        });
 }
 
+//starter function
+var start = function () {
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                message: "What would you like to look up today?",
+                choices: ["Tweets", "Songs", "Movies", "Nothing"],
+                name: "want"
+            }
+        ]).then(function (inquirerResponse) {
+            if (inquirerResponse.want === "Tweets") {
+                tweet();
+            }
+            else if (inquirerResponse.want === "Songs") {
+                song();
+            }
+            else if (inquirerResponse.want === "Movies") {
+                movie();
+            }
+            else {
+                console.log("Goobye :)")
+            }
+        });
+}
+
+start();

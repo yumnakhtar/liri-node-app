@@ -18,6 +18,7 @@ var inquirer = require("inquirer");
 
 //function using omdb
 var movie = function () {
+    //asking user which movie to search
     inquirer.prompt([
         {
             type: "input",
@@ -25,10 +26,11 @@ var movie = function () {
             name: "movie"
         }
     ]).then(function (inquirerResponse) {
+        //grab user input
         var input = inquirerResponse.movie;
 
         var queryUrl = "http://www.omdbapi.com/?t=" + input + "&y=&plot=short&apikey=trilogy";
-
+        //make API call and print out info returned
         Request(queryUrl, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 console.log("Release Year: " + JSON.parse(body).Year);
@@ -50,6 +52,7 @@ var movie = function () {
 
 //function using spotify
 var song = function () {
+    //asking user which song to search
     inquirer
         .prompt([
             {
@@ -58,6 +61,7 @@ var song = function () {
                 name: "song"
             }
         ]).then(function (inquirerResponse) {
+            //grab user input
             var input = inquirerResponse.song;
             var movieName = "";
             //iterate through input to make into correct format for API call
@@ -69,6 +73,7 @@ var song = function () {
                   movieName += input[i];
                 }
             }
+            //make API call, return specific info 
             spotify.search({ type: 'track', query: movieName }).then(function (response) {
                 console.log("Artist name: " + response.tracks.items[0].artists[0].name);
                 console.log("The song name: " + response.tracks.items[0].name);
@@ -83,6 +88,7 @@ var song = function () {
 
 //function using twitter
 var tweet = function () {
+    //asking user which twitter account to search
     inquirer
         .prompt([
             {
@@ -91,9 +97,11 @@ var tweet = function () {
                 name: "account"
             }
         ]).then(function (inquirerResponse) {
+            //grab user input
             var input = inquirerResponse.account;
 
             var params = { screen_name: input };
+            //make API call and return 20 most recent tweets
             client.get('statuses/user_timeline', params, function (error, tweets, response) {
                 if (!error) {
                     console.log("Users 20 latest tweets:")
@@ -110,6 +118,7 @@ var tweet = function () {
 
 //starter function
 var start = function () {
+    //ask user what they want to search
     inquirer
         .prompt([
             {

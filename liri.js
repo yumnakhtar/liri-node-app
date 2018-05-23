@@ -28,6 +28,17 @@ var movie = function () {
     ]).then(function (inquirerResponse) {
         //grab user input
         var input = inquirerResponse.movie;
+        // var movieName = "";
+
+        //iterate through input to make into correct format for API call
+        // for (var i = 0; i < input.length; i++) {
+        //     if (i > 0 && i < input.length) {
+        //         movieName = movieName + "+" + input[i];
+        //     }
+        //     else {
+        //         movieName += input[i];
+        //     }
+        // }
 
         var queryUrl = "http://www.omdbapi.com/?t=" + input + "&y=&plot=short&apikey=trilogy";
         //make API call and print out info returned
@@ -63,18 +74,9 @@ var song = function () {
         ]).then(function (inquirerResponse) {
             //grab user input
             var input = inquirerResponse.song;
-            var movieName = "";
-            //iterate through input to make into correct format for API call
-            for (var i = 0; i < input.length; i++) {
-                if (i > 0 && i < input.length) {
-                  movieName = movieName + "+" + input[i];
-                }
-                else {
-                  movieName += input[i];
-                }
-            }
+
             //make API call, return specific info 
-            spotify.search({ type: 'track', query: movieName }).then(function (response) {
+            spotify.search({ type: 'track', query: input }).then(function (response) {
                 console.log("Artist name: " + response.tracks.items[0].artists[0].name);
                 console.log("The song name: " + response.tracks.items[0].name);
                 console.log("Album name: " + response.tracks.items[0].album.name);
@@ -107,6 +109,7 @@ var tweet = function () {
                     console.log("Users 20 latest tweets:")
                     for (var i = 0; i < 20; i++) {
                         console.log((i + 1) + ": " + tweets[i].text);
+                        console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                     }
                 } else {
                     throw error;

@@ -73,7 +73,7 @@ then go ahead and make the requests you'd like and enjoy the responses!
 
 ## Authors
 
-* **Yumna Akhtar** - [Initial Work](https://github.com/PurpleBooth)
+* **Yumna Akhtar** - [Initial Work](https://github.com/yumnakhtar)
 
 ## License
 
